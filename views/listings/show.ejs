@@ -1,0 +1,146 @@
+<% layout("/layouts/boilerplate.ejs") %>
+<script>
+    const listing = "<%- JSON.stringify(listing) %>";
+</script>
+
+<body>
+    <br>
+    <h3 class="text-[2rem] font-bold mb-4 max-w-[100%] md:max-w-[50%] mx-auto"><%= listing.title %></h3>
+
+    <div class="card max-w-[100%] md:max-w-[50%] mx-auto bg-white rounded-lg">
+        <img src="<%= listing.image.url %>" alt="Listing Image" class="rounded-lg w-full h-[18rem] md:h-[25rem] object-fill" />
+        <div class="card-body pt-3 my-2 space-y-2">
+            <p class="text-md">Owned By - <i><%= listing.owner.username %></i></p>
+            <p class="text-md"><%= listing.description %></p>
+            <p class="text-gray-600">&#8377; <%= listing.price.toLocaleString("en-IN") %> / night</p>
+            <p class="text-md"><%= listing.location %></p>
+            <p class="text-md"><%= listing.country %></p>
+        </div>
+        
+        <% if (currUser && currUser._id.equals(listing.owner._id)) { %>
+            <div class="card-btns flex mt-5 sm:flex-row flex-col">
+                <br>
+                <a href="/listings/<%= listing._id %>/edit">
+                    <button class=" w-[6rem] md:w-[10rem] h-[2.5rem] border-black bg-[#FF385C] text-white rounded-md sm:mb-10 mb-6 mr-10">
+                        Edit 
+                        <i class="fa-regular fa-pen-to-square ml-1"></i>
+                    </button>
+                </a> 
+                
+                <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE">
+                    <button class=" w-[6rem] md:w-[10rem] h-[2.5rem] border-black bg-gray-500 text-white rounded-md mb-10">
+                        Delete
+                        <i class="fa-regular fa-trash-can ml-1"></i>
+                    </button>
+                </form>
+            </div>
+            
+        <% } %>
+
+        <% if (!(currUser && currUser._id.equals(listing.owner._id))) { %>
+        <br>
+        <% } %>   
+        
+        <hr> 
+        
+        <!-- if user exists that means if he is logged in then only he/she can write a review-->
+        <% if (currUser) { %>  
+        <!-- Review form -->
+        <div>
+            <h3 class="text-[2rem] font-bold mb-4 max-w-[100%] mx-auto">Leave a Review</h3>
+
+            <form method="POST" action="/listings/<%= listing._id %>/reviews" class="max-w-[100%] mx-auto bg-white" id="form">
+                <!-- Rating Field -->
+                <label for="rating">Rating</label>
+                <fieldset class="starability-heartbeat mt-2">
+                    <input name="review[rating]" type="radio" id="no-rate" class="input-no-rate" name="rating" value="1" checked aria-label="No rating." />
+                    <input name="review[rating]" type="radio" id="first-rate1" name="rating" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input name="review[rating]" type="radio" id="first-rate2" name="rating" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input name="review[rating]" type="radio" id="first-rate3" name="rating" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input name="review[rating]" type="radio" id="first-rate4" name="rating" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input name="review[rating]" type="radio" id="first-rate5" name="rating" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                </fieldset>
+
+                <!-- Comment Field -->
+                <div class="mb-4 relative formControl">
+                    <label for="comment" class="block">Comment</label>
+                    <textarea name="review[comment]" placeholder="Write your review here..." class="border border-gray-400 p-2 w-full rounded-md shadow-md focus:outline-none" id="comment" rows="5"></textarea>
+                    
+                    <!-- Include form feedback like in other forms -->
+                    <%- include("../includes/formFeedback.ejs") %>
+                </div>
+
+                <!-- Submit Button -->
+                <button class="w-[6rem] h-[2.5rem] border-black bg-[#FF385C] text-white rounded-md mb-10">
+                    Submit
+                    <i class="fa-solid fa-circle-check ml-1"></i>
+                </button>
+            </form>
+        </div>
+        <% } %>
+
+        <hr> 
+        <!-- All-Review -->
+        <% if (listing.reviews.length > 0) { %>
+         <div class="my-7">
+            <h3 class="text-[2rem] font-bold mb-4 max-w-[100%] md:max-w-[60%]">All Reviews</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <% for( let  review of listing.reviews ) { %>
+                    <div class="w-full p-6 bg-white border border-gray-200 rounded-lg shadow ">
+                        <h5 class="mb-2 text-2xl font-bold tracking-tight text-gray-900">@<%= review.author.username %></h5>
+                        <p class="mb-3 starability-result w-5 h-3" data-rating="<%= review.rating %>"></p>
+                        <p class="mb-3 font-normal text-gray-700"> <%= review.comment %> </p>
+                        
+                        <% if (currUser && currUser._id.equals(review.author._id)) { %>
+                            <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                                <button class="w-[5rem] md:w-[7rem] h-[2.5rem] border-black bg-gray-500 text-white rounded-md p-1">
+                                    Delete
+                                    <i class="fa-regular fa-trash-can ml-1"></i>
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                    
+                <% } %>
+            </div>
+        </div>
+        <% } %>
+
+        <div >
+            <h3 class="text-[2rem] font-bold mb-4 max-w-[100%] mx-auto">Where you'll be</h3>
+            <div id="map"></div>
+        </div>
+
+    </div>
+
+    <!-- <script>
+        let mapToken = "< process.env.MAP_TOKEN %>";
+        console.log(mapToken);
+        
+        mapboxgl.accessToken = mapToken;
+        const map = new mapboxgl.Map({
+            container: 'map', // container ID
+            center: [-74.5, 40], // starting position [lng, lat]. Note that lat must be set between -90 and 90
+            zoom: 9 // starting zoom
+        });
+    </script> -->
+    <!-- <script>
+        // Initialize the map
+        var map = L.map('map').setView([28.6139, 77.2088], 13);  // Default coordinates (London)
+    
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    
+        
+    </script> -->
+
+    <!-- <a href="/listings/%=listing._id%>?_method=DELETE">Delete</a>   -->
+    <!-- // not working because ine GET req marta -->
+
+    <!-- <script src="/js/script.js"></script> *** pasted in boilerplate.ejs *** -->
+</body>

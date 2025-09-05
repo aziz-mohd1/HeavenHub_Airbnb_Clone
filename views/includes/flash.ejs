@@ -1,0 +1,76 @@
+<% if (success && success.length) { %>
+<div
+  class="flash-alert sm:w-[90%] md:w-[50%] mx-auto flex justify-center items-center p-4 mt-4 text-sm text-green-700 border border-green-700 rounded-lg bg-green-200 transition-opacity duration-1000 opacity-100"
+  role="alert"
+>
+  <i class="fa-solid fa-circle-check text-[green] mx-2"></i>
+
+  <span class="font-medium"><%= success %></span>
+
+  <button
+    type="button"
+    class="btn ms-auto -mx-1.5 -my-1.5 text-[green] rounded-lg inline-flex items-center justify-center h-8 w-8"
+  >
+    <svg
+      class="w-3 h-3"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 14 14"
+    >
+      <path
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+      />
+    </svg>
+  </button>
+</div>
+
+<% } %> <% if (error && error.length) { %>
+<div
+  class="flash-alert sm:w-[90%] md:w-[50%] mx-auto flex justify-center items-center p-4 mt-4 text-sm text-red-600 border border-red-600 rounded-lg bg-red-100 transition-opacity duration-1000 opacity-100"
+  role="alert"
+>
+  <i class="fa-solid fa-circle-exclamation text-[red] mx-2"></i>
+
+  <span class="font-medium"><%= error %></span>
+
+  <button
+    type="button"
+    class="btn ms-auto -mx-1.5 -my-1.5 text-[red] rounded-lg inline-flex items-center justify-center h-8 w-8"
+  >
+    <svg
+      class="w-3 h-3"
+      aria-hidden="true"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 14 14"
+    >
+      <path
+        stroke="currentColor"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
+      />
+    </svg>
+  </button>
+</div>
+
+<% } %>
+
+<script>
+  let flashAlert = document.querySelector(".flash-alert");
+  let crossBtn = document.querySelector(".btn");
+  if (crossBtn) {
+    crossBtn.addEventListener("click", () => {
+      flashAlert.style.opacity = 0;
+      setTimeout(() => {
+        flashAlert.classList.add("hidden");
+      }, 1000);
+    });
+  }
+</script>

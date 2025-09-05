@@ -1,0 +1,32 @@
+<% layout("/layouts/boilerplate.ejs") %>
+<body class="overflow-x-hidden">
+    <br>
+    <h3 class="text-[2rem] font-bold mb-4 max-w-[100%] md:max-w-[50%] mx-auto">Login to HeavenHub!</h3>
+
+    <form method="POST" action="/login" class="max-w-[100%] md:max-w-[50%] mx-auto bg-white" id="form">
+        <div class="mb-4 relative formControl">
+            <label for="username" class="block">Username</label>
+
+            <input type="text" name="username" class="border border-gray-400 p-2 w-full rounded-md shadow-md  mb-1 focus:outline-none" id="username">
+
+            <%- include("../includes/formFeedback.ejs") %>
+
+        </div>
+
+        <div class="mb-4 relative formControl">
+            <label for="password" class="block">Password</label>
+            
+            <input type="password" name="password" class="border border-gray-400 p-2 w-full rounded-md shadow-md focus:outline-none" id="password">
+
+            <%- include("../includes/formFeedback.ejs") %>
+        </div>
+        
+        <button class="w-[6rem] h-[2.5rem] border-black bg-[#FF385C] text-white rounded-md mb-10">
+           Login
+        </button>
+    </form>
+    <!-- <script src="/js/script.js"></script> *** pasted in boilerplate.ejs *** -->
+</body>
+
+
+

@@ -1,0 +1,107 @@
+<% layout("/layouts/boilerplate.ejs") %>
+<body class="overflow-x-hidden">
+  <br />
+  <h3 class="text-[2rem] font-bold mb-4 max-w-[100%] md:max-w-[60%] mx-auto">
+    Create New Listing
+  </h3>
+
+  <form
+    method="POST"
+    action="/listings"
+    class="max-w-[100%] md:max-w-[60%] mx-auto bg-white"
+    id="form"
+    enctype="multipart/form-data"
+  >
+    <div class="mb-4 relative formControl">
+      <label for="title" class="block">Title</label>
+
+      <input
+        type="text"
+        name="listing[title]"
+        placeholder="Eg: My Villa"
+        class="border border-gray-400 p-2 w-full rounded-md shadow-md mb-1 focus:outline-none"
+        id="title"
+      />
+
+      <%- include("../includes/formFeedback.ejs") %>
+    </div>
+
+    <div class="mb-4 relative description formControl">
+      <label for="description" class="block">Description</label>
+
+      <textarea
+        name="listing[description]"
+        placeholder="Eg: It is a very peaceful place..."
+        class="border border-gray-400 p-2 w-full rounded-md shadow-md focus:outline-none"
+        id="description"
+      ></textarea>
+
+      <%- include("../includes/formFeedback.ejs") %>
+    </div>
+
+    <div class="mb-4 relative formControl">
+      <label for="image" class="block">Upload Listing Image</label>
+
+      <input
+        type="file"
+        name="listing[image]"
+        class="border border-gray-400 w-full p-1 rounded-md shadow-md focus:outline-none"
+        id="image"
+        required
+      />
+      <%- include("../includes/formFeedback.ejs") %>
+    </div>
+
+    <div class="flex">
+      <div class="mb-4 w-2/5 mr-4 relative formControl">
+        <label for="price" class="block">Price</label>
+
+        <input
+          type="number"
+          name="listing[price]"
+          placeholder="Eg: 1200"
+          class="border border-gray-400 p-2 w-full rounded-md shadow-md mb-1 focus:outline-none"
+          id="price"
+        />
+
+        <%- include("../includes/formFeedback.ejs") %>
+      </div>
+
+      <div class="mb-4 w-4/5 relative formControl">
+        <label for="country" class="block">Country</label>
+
+        <input
+          type="text"
+          name="listing[country]"
+          placeholder="Eg: India"
+          class="border border-gray-400 p-2 w-full rounded-md shadow-md mb-1 focus:outline-none"
+          id="country"
+        />
+
+        <%- include("../includes/formFeedback.ejs") %>
+      </div>
+    </div>
+
+    <div class="mb-16 relative formControl">
+      <label for="location" class="block">Location</label>
+
+      <input
+        type="text"
+        name="listing[location]"
+        placeholder="Eg: Banjara Hills, Hyderabad."
+        class="border border-gray-400 p-2 w-full rounded-md shadow-md mb-1 focus:outline-none"
+        id="location"
+      />
+
+      <%- include("../includes/formFeedback.ejs") %>
+    </div>
+
+    <button
+      class="w-[6rem] h-[2.5rem] border-black bg-[#FF385C] text-white rounded-md mb-10"
+    >
+      ADD
+      <i class="fa-solid fa-circle-plus ml-1"></i>
+    </button>
+  </form>
+  <!-- <script src="/js/script.js"></script> *** pasted in boilerplate.ejs *** -->
+</body>
