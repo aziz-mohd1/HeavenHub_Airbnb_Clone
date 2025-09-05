@@ -116,6 +116,10 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 
+app.get("/", (req, res) => {
+    res.render("home");  // looks for views/home.ejs
+});
+
 // Joi
 /*const validateListing = validateSchema(listingSchema);
 const validateReview = validateSchema(reviewSchema);
