@@ -49,52 +49,60 @@ module.exports.showListing = async (req, res) => {
 
 module.exports.createListing = async (req, res, next) => {
   try {
-    const { location } = req.body.listing; // Extract location from the form
-    const url = req.file.path;
-    const filename = req.file.filename;
+    const { location } = req.body.listing; 
+    const url = req.file?.path;
+    const filename = req.file?.filename;
 
-    // Use Nominatim API for geocoding the location
-    const geocodeResponse = await axios.get("https://nominatim.openstreetmap.org/search", {
-      params: {
-        q: location,
-        format: "json",
-        addressdetails: 1,
-        limit: 1,
-      },
-    });
+    let coordinates = [];
 
-    // Check if geocoding results are returned
-    if (!geocodeResponse.data.length) {
-      req.flash("error", "Could not find location coordinates. Please try again.");
-      return res.redirect("/listings/new");
+    try {
+      // Use Nominatim API for geocoding
+      const geocodeResponse = await axios.get("https://nominatim.openstreetmap.org/search", {
+        params: {
+          q: location || "",
+          format: "json",
+          addressdetails: 1,
+          limit: 1,
+        },
+      });
+
+      if (geocodeResponse.data.length > 0) {
+        const { lat, lon } = geocodeResponse.data[0];
+        coordinates = [parseFloat(lon), parseFloat(lat)];
+      } else {
+        console.warn("Could not find location coordinates:", location);
+      }
+
+    } catch (geoError) {
+      //  Catch geocoding errors but do NOT throw
+      console.error("Geocoding failed:", geoError.message);
+      // leave coordinates empty, fallback will be used
     }
 
-    // Extract latitude and longitude from the geocoding API response
-    const { lat, lon } = geocodeResponse.data[0];
-    const coordinates = [parseFloat(lon), parseFloat(lat)];
+    // Create the listing
+    const newListing = new Listing(req.body.listing);
+    newListing.owner = req.user._id;
+    if (url && filename) newListing.image = { url, filename };
 
-    // console.log(geocodeResponse.data[0]);
-    // res.send("done!");
-    
-    // Create a new listing and save the geocoded coordinates
-    let newListing = new Listing(req.body.listing);
-    newListing.owner = req.user._id; // Add owner to listing
-    newListing.image = { url, filename };
+    // Save coordinates if available
+    newListing.geometry = { type: "Point", coordinates };
 
-    newListing.geometry = { type: "Point", coordinates }; // Save coordinates in 'geometry' field
-
-    console.log(newListing);
-    
     await newListing.save();
-    
+
     req.flash("success", "New Listing Created!");
-    return res.redirect("/listings");
-  } catch (error) {
-    console.error("Error during geocoding:", error.message);
-    req.flash("error", "Failed to create listing. Please try again.");
-    return res.redirect("/listings/new");
+    return res.redirect("/listings"); //  single response guaranteed
+
+  } catch (err) {
+    console.error("Error creating listing:", err.message);
+
+    // ✅ Only send one response
+    if (!res.headersSent) {
+      req.flash("error", "Failed to create listing. Please try again.");
+      return res.redirect("/listings/new");
+    }
   }
 };
+
 
 
 module.exports.renderEditForm = async (req, res) => {
