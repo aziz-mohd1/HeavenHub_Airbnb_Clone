@@ -49,59 +49,65 @@ module.exports.showListing = async (req, res) => {
 
 module.exports.createListing = async (req, res, next) => {
   try {
-    const { location } = req.body.listing; 
+    const { location } = req.body.listing; // could be "California, USA" or "Goa, India"
     const url = req.file?.path;
     const filename = req.file?.filename;
 
-    let coordinates = [];
+    let coordinates;
 
-    try {
-      // Use Nominatim API for geocoding
-      const geocodeResponse = await axios.get("https://nominatim.openstreetmap.org/search", {
+    // Try to geocode the exact location first
+    let geocodeResponse = await axios.get("https://nominatim.openstreetmap.org/search", {
+      params: {
+        q: location,
+        format: "json",
+        addressdetails: 1,
+        limit: 1,
+      },
+    });
+
+    if (geocodeResponse.data.length > 0) {
+      const { lat, lon } = geocodeResponse.data[0];
+      coordinates = [parseFloat(lon), parseFloat(lat)];
+    } else {
+      // Fallback: try only country or state from location field
+      const parts = location.split(","); // split by comma
+      const fallbackLocation = parts.length > 1 ? parts[parts.length - 1].trim() : location;
+
+      const fallbackResponse = await axios.get("https://nominatim.openstreetmap.org/search", {
         params: {
-          q: location || "",
+          q: fallbackLocation,
           format: "json",
           addressdetails: 1,
           limit: 1,
         },
       });
 
-      if (geocodeResponse.data.length > 0) {
-        const { lat, lon } = geocodeResponse.data[0];
+      if (fallbackResponse.data.length > 0) {
+        const { lat, lon } = fallbackResponse.data[0];
         coordinates = [parseFloat(lon), parseFloat(lat)];
       } else {
-        console.warn("Could not find location coordinates:", location);
+        // If all fails, default to world center
+        coordinates = [0, 0];
+        console.warn(`Could not find location or country/state for: ${location}. Using fallback [0,0].`);
       }
-
-    } catch (geoError) {
-      //  Catch geocoding errors but do NOT throw
-      console.error("Geocoding failed:", geoError.message);
-      // leave coordinates empty, fallback will be used
     }
 
-    // Create the listing
+    // Create new listing
     const newListing = new Listing(req.body.listing);
     newListing.owner = req.user._id;
     if (url && filename) newListing.image = { url, filename };
-
-    // Save coordinates if available
     newListing.geometry = { type: "Point", coordinates };
 
     await newListing.save();
-
     req.flash("success", "New Listing Created!");
-    return res.redirect("/listings"); //  single response guaranteed
-
-  } catch (err) {
-    console.error("Error creating listing:", err.message);
-
-    // ✅ Only send one response
-    if (!res.headersSent) {
-      req.flash("error", "Failed to create listing. Please try again.");
-      return res.redirect("/listings/new");
-    }
+    res.redirect("/listings");
+  } catch (error) {
+    console.error("Error creating listing:", error.message);
+    req.flash("error", "Failed to create listing. Please try again.");
+    res.redirect("/listings/new");
   }
 };
+
 
 
 
