@@ -39,7 +39,7 @@
         <div class="hidden md:flex items-center space-x-5 ">
             <a href="/listings/new" class="text-sm font-semibold createListingBtn text-[1.1rem]">HeavenHub your home</a>
             <div class="menuBar flex space-x-5 px-5 py-2 border rounded-3xl shadow-md border-gray-400">
-                <% if (!currUser) { %>
+                <% if (typeof currUser === "undefined" || !currUser) { %>
                     <a href="/signup" class="font-semibold">Sign up</a>
                     <a href="/login" class="font-semibold">Log in</a>
                 <% } else { %>
@@ -58,7 +58,7 @@
     <div id="mobile-menu" class="hidden bg-white">
         <div class="flex flex-col justify-center items-center space-y-1">
             <a href="/listings/new" class="text-sm font-semibold text-[1.1rem]">HeavenHub your home</a>
-            <% if (!currUser) { %>
+            <% if (typeof currUser === "undefined" || !currUser) { %>
                 <a href="/signup" class="font-semibold text-[1.3rem]">Sign up</a>
                 <a href="/login" class="font-semibold text-[1.3rem]">Log in</a>
             <% } else { %>
